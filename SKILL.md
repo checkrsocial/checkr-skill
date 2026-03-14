@@ -78,12 +78,15 @@ detail = client.get(f"https://api.checkr.social/v1/token/{top}").json()
 
 ## Query Params
 
-- `GET /v1/leaderboard?hours=4&limit=10` — ATT delta over 4h window, top 10
-- `GET /v1/spikes?min_velocity=3.0&min_mentions=10` — filter by velocity/mentions
+- `GET /v1/leaderboard?hours=4&limit=10` — ATT delta over specified window (1, 2, 4, 8, 12, or 24h), top N tokens
+- `GET /v1/bankr?hours=4` — bankr agents dashboard over specified window (1, 2, 4, 8, 12, or 24h)
+- `GET /v1/spikes?min_velocity=3.0&min_mentions=10` — filter by velocity/mentions thresholds
 
 ## Data Freshness
 
-All data is pre-computed. No live Twitter API calls at request time. `data_age_minutes` in every response tells you how stale the data is (max ~30 min).
+- **Leaderboard & bankr (default hours=4):** Uses pre-computed 4h snapshot (fast, 0-4h old). Updated every 4 hours.
+- **Leaderboard & bankr (custom hours):** Computed fresh from DB on every request (1-2s response time, always current).
+- **Spikes & token endpoints:** Pre-computed, updated every ~30 min. `data_age_minutes` in response shows staleness.
 
 ## Requirements
 

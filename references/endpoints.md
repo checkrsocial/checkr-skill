@@ -3,7 +3,7 @@
 ## GET /v1/leaderboard
 
 **Price:** $0.02/call  
-**Params:** `?hours=1|2|4|24` (default 2), `?limit=1-50` (default 10)
+**Params:** `?hours=1|2|4|8|12|24` (default 4), `?limit=1-50` (default 10)
 
 ```json
 {
@@ -76,14 +76,17 @@
 ## GET /v1/bankr
 
 **Price:** $0.05/call  
-**Params:** none
+**Params:** `?hours=1|2|4|8|12|24` (default 4, optional)
 
 Competitive intelligence dashboard for bankr agents. Shows attention metrics for all 19 tracked bankr agents with dual normalization: bankr-relative (ATT_pct) and full Base context (ATT_base).
 
+**Data freshness:** Computed from database on every request (1-2s response time). No cached data — always reflects current state within the time window.
+
 ```json
 {
-  "updated_at": "2026-03-14T18:22:37.791571+00:00",
-  "data_age_minutes": 15.3,
+  "updated_at": "2026-03-14T20:15:41.900167+00:00",
+  "data_age_minutes": 0.0,
+  "window_hours": 4,
   "agents_tracked": 19,
   "active_agents": 8,
   "total_attention_share": 25.0,
@@ -92,29 +95,31 @@ Competitive intelligence dashboard for bankr agents. Shows attention metrics for
       "symbol": "doppel",
       "ATT_pct": 25.0,
       "ATT_base": 5.7,
-      "ATT_delta_4h": 0.0,
-      "velocity": 4.8,
-      "mentions_2h": 6,
+      "ATT_delta": 0.0,
+      "velocity": 0.0,
+      "mentions_4h": 6,
+      "unique_authors": 5,
       "rank": 4
     },
     {
       "symbol": "kellyclaude",
       "ATT_pct": 24.1,
       "ATT_base": 5.5,
-      "ATT_delta_4h": 0.0,
-      "velocity": 9.0,
-      "mentions_2h": 4,
+      "ATT_delta": 0.0,
+      "velocity": 0.0,
+      "mentions_4h": 4,
+      "unique_authors": 4,
       "rank": 5
     }
   ],
-  "top_gainers_4h": [
+  "top_gainers": [
     {
       "symbol": "felix",
       "delta": 0.7,
       "ATT_pct": 18.4
     }
   ],
-  "top_losers_4h": [
+  "top_losers": [
     {
       "symbol": "earendel",
       "delta": -3.8,
@@ -125,11 +130,14 @@ Competitive intelligence dashboard for bankr agents. Shows attention metrics for
 ```
 
 **Fields:**
+- `window_hours` — time window used for aggregation (matches `hours` param, default 4)
+- `data_age_minutes` — always 0.0 (computed fresh from DB on every request)
 - `ATT_pct` — attention share within bankr universe (normalized to 100%). Shows competitive position: "25.0% = this agent has 25% of all bankr agent attention"
 - `ATT_base` — attention share in full Base ecosystem (context). Shows real market performance: "5.7% = this agent has 5.7% of all Base token attention"
-- `ATT_delta_4h` — change in base ATT% over 4h. Positive = gaining real market attention, negative = losing
-- `velocity` — current spike multiplier (3.0+ = active spike)
-- `mentions_2h` — total mentions in last 2h window
+- `ATT_delta` — change in base ATT% vs previous window. Positive = gaining real market attention, negative = losing
+- `velocity` — spike multiplier vs baseline (0.0 from snapshot aggregation; use mentions growth for spike detection)
+- `mentions_Nh` — total mentions in the time window (field name varies: `mentions_1h`, `mentions_4h`, etc.)
+- `unique_authors` — number of distinct accounts posting about this agent
 - `rank` — global rank among all Base tokens (1 = most attention)
 
 **Use cases:**

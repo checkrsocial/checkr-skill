@@ -26,9 +26,10 @@ Then ask your agent: *"what's spiking on Base right now?"* or *"check attention 
 
 - **Radar sweep** — what's moving across all 62 tracked Base tokens right now
 - **Token deep dive** — ATT deltas, price, divergence signal, narrative summary
-- **Leaderboard** — top 10 by attention share with trend direction
-- **Bankr agents dashboard** — competitive intelligence for 19 bankr agents
+- **Leaderboard** — top 10 by attention share with trend direction (configurable 1-24h windows)
+- **Bankr agents dashboard** — competitive intelligence for 19 bankr agents (configurable 1-24h windows)
 - **Divergence detection** — when attention and price are moving in opposite directions
+- **Always fresh** — data computed from DB on every request (1-2s response time, no stale cache)
 
 ## How it works
 
