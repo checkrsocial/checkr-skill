@@ -85,6 +85,8 @@ Competitive intelligence dashboard for bankr agents. Shows attention metrics for
   "updated_at": "2026-03-14T18:22:37.791571+00:00",
   "data_age_minutes": 15.3,
   "agents_tracked": 19,
+  "active_agents": 8,
+  "total_attention_share": 25.0,
   "leaderboard": [
     {
       "symbol": "doppel",
