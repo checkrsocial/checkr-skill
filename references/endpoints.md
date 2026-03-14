@@ -73,7 +73,7 @@
 
 ---
 
-## GET /v1/bankr/universe
+## GET /v1/bankr
 
 **Price:** $0.05/call  
 **Params:** none

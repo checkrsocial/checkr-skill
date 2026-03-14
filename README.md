@@ -53,7 +53,7 @@ print(token["narrative"]["summary"])
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top 10 Base tokens by attention share |
 | `GET /v1/spikes` | $0.05 | Active velocity spikes across all tokens |
-| `GET /v1/bankr/universe` | $0.05 | Bankr agents competitive dashboard |
+| `GET /v1/bankr` | $0.05 | Bankr agents competitive dashboard |
 | `GET /v1/token/{symbol}` | $0.50 | Full attention snapshot for one token |
 
 ## Requirements
