@@ -2,7 +2,7 @@
 
 Real-time X attention intelligence for Base coins. Works with OpenClaw and Claude Code.
 
-Track mention velocity, attention share, active narrative spikes, and attention/price divergence — updated every 30 minutes from the live CT feed.
+Track mention velocity, attention share, active narrative spikes, attention/price divergence, and competitive intelligence for bankr agents — updated every 30 minutes from the live CT feed.
 
 ## Install
 
@@ -24,9 +24,10 @@ Then ask your agent: *"what's spiking on Base right now?"* or *"check attention 
 
 ## What you get
 
-- **Radar sweep** — what's moving across all 52 tracked Base tokens right now
+- **Radar sweep** — what's moving across all 62 tracked Base tokens right now
 - **Token deep dive** — ATT deltas, price, divergence signal, narrative summary
 - **Leaderboard** — top 10 by attention share with trend direction
+- **Bankr agents dashboard** — competitive intelligence for 19 bankr agents
 - **Divergence detection** — when attention and price are moving in opposite directions
 
 ## How it works
@@ -52,6 +53,7 @@ print(token["narrative"]["summary"])
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top 10 Base tokens by attention share |
 | `GET /v1/spikes` | $0.05 | Active velocity spikes across all tokens |
+| `GET /v1/bankr/universe` | $0.05 | Bankr agents competitive dashboard |
 | `GET /v1/token/{symbol}` | $0.50 | Full attention snapshot for one token |
 
 ## Requirements
@@ -68,6 +70,9 @@ print(token["narrative"]["summary"])
 - *"Show me the top 5 Base tokens by attention"*
 - *"Did $FELIX attention grow in the last 4 hours?"*
 - *"Has $DRB had any confirmed spikes recently?"*
+- *"Show me the bankr agents leaderboard"*
+- *"Which bankr agent is dominating attention right now?"*
+- *"What's the biggest gainer among bankr agents in the last 4h?"*
 
 ## API reference
 

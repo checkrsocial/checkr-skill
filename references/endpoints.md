@@ -73,6 +73,72 @@
 
 ---
 
+## GET /v1/bankr/universe
+
+**Price:** $0.05/call  
+**Params:** none
+
+Competitive intelligence dashboard for bankr agents. Shows attention metrics for all 19 tracked bankr agents with dual normalization: bankr-relative (ATT_pct) and full Base context (ATT_base).
+
+```json
+{
+  "updated_at": "2026-03-14T18:22:37.791571+00:00",
+  "data_age_minutes": 15.3,
+  "agents_tracked": 19,
+  "leaderboard": [
+    {
+      "symbol": "doppel",
+      "ATT_pct": 25.0,
+      "ATT_base": 5.7,
+      "ATT_delta_4h": 0.0,
+      "velocity": 4.8,
+      "mentions_2h": 6,
+      "rank": 4
+    },
+    {
+      "symbol": "kellyclaude",
+      "ATT_pct": 24.1,
+      "ATT_base": 5.5,
+      "ATT_delta_4h": 0.0,
+      "velocity": 9.0,
+      "mentions_2h": 4,
+      "rank": 5
+    }
+  ],
+  "top_gainers_4h": [
+    {
+      "symbol": "felix",
+      "delta": 0.7,
+      "ATT_pct": 18.4
+    }
+  ],
+  "top_losers_4h": [
+    {
+      "symbol": "earendel",
+      "delta": -3.8,
+      "ATT_pct": 0.0
+    }
+  ]
+}
+```
+
+**Fields:**
+- `ATT_pct` — attention share within bankr universe (normalized to 100%). Shows competitive position: "25.0% = this agent has 25% of all bankr agent attention"
+- `ATT_base` — attention share in full Base ecosystem (context). Shows real market performance: "5.7% = this agent has 5.7% of all Base token attention"
+- `ATT_delta_4h` — change in base ATT% over 4h. Positive = gaining real market attention, negative = losing
+- `velocity` — current spike multiplier (3.0+ = active spike)
+- `mentions_2h` — total mentions in last 2h window
+- `rank` — global rank among all Base tokens (1 = most attention)
+
+**Use cases:**
+- Competitive intelligence: "Which bankr agent is dominating the ecosystem?"
+- Portfolio monitoring: "Is my agent gaining or losing attention?"
+- Trading signals: "Which agents are spiking right now?"
+
+**Tracked agents:** 19 out of 21 bankr agents (AMBERVIBE, ANTIHUNTER, ATLASFORGE, AXOBOTL, BOTCOIN, CLAWD, DOPPEL, EARENDEL, ETHR, FELIX, GITLAWB, JUNO, KELLYCLAUDE, MOLT, NOOK, OPENAGENTMARKET, PERKOS, STAKR, YOSHI)
+
+---
+
 ## GET /v1/token/[symbol]
 
 **Price:** $0.50/call
@@ -132,4 +198,4 @@
 
 ## Universe
 
-52 Base chain tokens tracked. Universe is dynamic — updated via GeckoTerminal new pool discovery + X-first social signal detection.
+62 Base chain tokens tracked (including 19 bankr agents). Universe is dynamic — updated via GeckoTerminal new pool discovery + X-first social signal detection.
