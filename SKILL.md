@@ -23,6 +23,7 @@ Real-time X/Twitter attention intelligence for Base chain tokens. Updated every 
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top 10 Base tokens ranked by social attention share |
 | `GET /v1/spikes` | $0.05 | Tokens currently velocity-spiking (radar sweep) |
+| `GET /v1/bankr/universe` | $0.05 | Bankr agents competitive intelligence dashboard |
 | `GET /v1/token/{symbol}` | $0.50 | Deep dive: ATT deltas, price, divergence, narrative |
 
 See `references/endpoints.md` for full response schemas and examples.
