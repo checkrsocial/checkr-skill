@@ -9,66 +9,65 @@ description: |
   Payments via x402 — USDC on Base, no API key or account needed.
 ---
 
-# checkr API
+# checkr
 
-Real-time X/Twitter attention intelligence for Base chain tokens. Updated every ~30 minutes by the heartbeat pipeline.
+Real-time X/Twitter attention intelligence for Base chain tokens.
 
 **Base URL:** `https://api.checkr.social`  
 **Docs:** `https://api.checkr.social/docs`  
-**Payment:** x402 — USDC on Base mainnet, pay-per-call, no account needed
+**Payment:** x402 — USDC on Base mainnet, pay-per-call, no account needed.
 
 ## Endpoints
 
 | Endpoint | Price | What it returns |
 |---|---|---|
-| `GET /v1/leaderboard` | $0.02 | Top 10 Base tokens ranked by social attention share |
-| `GET /v1/spikes` | $0.05 | Tokens currently velocity-spiking (radar sweep) |
-| `GET /v1/bankr` | $0.05 | Bankr agents competitive intelligence dashboard |
+| `GET /v1/leaderboard` | $0.02 | Top Base tokens ranked by social attention share |
+| `GET /v1/spikes` | $0.05 | Tokens currently velocity-spiking (the radar sweep) |
 | `GET /v1/token/{symbol}` | $0.50 | Deep dive: ATT deltas, price, divergence, narrative |
+| `GET /v1/bankr` | $0.02 | Attention leaderboard for the bankr agent ecosystem |
 
-See `references/endpoints.md` for full response schemas and examples.
+Full response schemas and field definitions: `https://api.checkr.social/docs`
 
 ## How to Call (x402)
 
-x402 is pay-per-call HTTP. No API key. Wallet + USDC on Base is all you need.
+x402 is pay-per-call. No API key or account. Wallet + USDC on Base is all you need.
 
-**Python (recommended):**
+**Python:**
 ```python
 from x402.client import x402_client
 
 client = x402_client(wallet=YOUR_WALLET)
 
-# Leaderboard — $0.02
-lb = client.get("https://api.checkr.social/v1/leaderboard")
+# What's spiking right now — $0.05
+spikes = client.get("https://api.checkr.social/v1/spikes").json()
 
-# What's spiking — $0.05
-spikes = client.get("https://api.checkr.social/v1/spikes")
+# Top tokens by attention — $0.02
+leaderboard = client.get("https://api.checkr.social/v1/leaderboard").json()
 
-# Deep dive — $0.50
-token = client.get("https://api.checkr.social/v1/token/FAI")
+# Deep dive on a token — $0.50
+token = client.get("https://api.checkr.social/v1/token/BNKR").json()
 ```
 
 **TypeScript:**
 ```typescript
 import { withPaymentInterceptor } from "x402-axios";
 import axios from "axios";
-import { createWalletClient } from "viem";
 
 const client = withPaymentInterceptor(axios.create(), walletClient);
 
 const { data } = await client.get("https://api.checkr.social/v1/spikes");
 ```
 
-Payment is handled automatically by the x402 client — it intercepts the 402 response, signs and sends the payment, then retries with the receipt.
+Payment is handled automatically by the x402 client — it intercepts the 402, signs and sends payment, then retries with the receipt.
 
 ## Practical Flow
 
-Use spikes as your radar, then drill into token for context:
+Use spikes as your radar. Drill into token for context.
 
 ```python
-# 1. What's moving right now?
+# 1. What's moving?
 spikes = client.get("https://api.checkr.social/v1/spikes").json()
-# → [{ symbol: "FAI", velocity: 4.1, ATT_pct: 9.6, narrative_summary: "..." }]
+# → [{ symbol: "TIBBIR", velocity: 3.9, ATT_pct: 11.4, divergence: false, hawkes: {...} }]
 
 # 2. Deep dive on the top spike
 top = spikes["spikes"][0]["symbol"]
@@ -76,20 +75,33 @@ detail = client.get(f"https://api.checkr.social/v1/token/{top}").json()
 # → full price, divergence, spike history, narrative
 ```
 
+## Key Fields
+
+**On every response:**
+- `data_age_minutes` — how fresh the data is. Use before acting.
+
+**On spikes:**
+- `velocity` — momentum multiplier vs baseline. 3.0+ = meaningful spike.
+- `divergence` — `true` = attention up, price flat/down. The alpha pattern.
+- `hawkes.viral_class` — `BUILDING` / `SUSTAINED` / `FADING`. Is this self-reinforcing?
+- `rotating_from` — tokens losing attention as this one gains.
+- `narrative_summary` — AI-generated 180-char brief. `null` if signal below confidence threshold.
+
+**On token deep dive:**
+- `ATT_delta_1h` / `ATT_delta_4h` — attention share movement over time.
+- `spike_history.hit_rate` — % of past spikes with confirmed price follow-through.
+- `narrative.type` — `infrastructure` / `ecosystem` / `fud_defense` / `meme` / `launch_hype`.
+
 ## Query Params
 
-- `GET /v1/leaderboard?hours=4&limit=10` — ATT delta over specified window (1, 2, 4, 8, 12, or 24h), top N tokens
-- `GET /v1/bankr?hours=4` — bankr agents dashboard over specified window (1, 2, 4, 8, 12, or 24h)
-- `GET /v1/spikes?min_velocity=3.0&min_mentions=10` — filter by velocity/mentions thresholds
-
-## Data Freshness
-
-- **Leaderboard & bankr (default hours=4):** Uses pre-computed 4h snapshot (fast, 0-4h old). Updated every 4 hours.
-- **Leaderboard & bankr (custom hours):** Computed fresh from DB on every request (1-2s response time, always current).
-- **Spikes & token endpoints:** Pre-computed, updated every ~30 min. `data_age_minutes` in response shows staleness.
+```
+GET /v1/leaderboard?limit=10&sort_by=ATT_pct&min_mentions=5
+GET /v1/spikes?min_velocity=3.0&min_mentions=10&divergence_only=false
+```
 
 ## Requirements
 
-- Wallet with USDC on Base mainnet
-- x402 Python client: `pip install x402` or TypeScript: `npm install x402-axios`
-- Gas on Base for the payment transaction (typically < $0.01)
+- USDC on Base mainnet
+- Python: `pip install x402`
+- TypeScript: `npm install x402-axios`
+- Base gas for payment (~$0.01)
