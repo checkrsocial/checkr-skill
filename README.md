@@ -24,11 +24,11 @@ Then ask your agent: *"what's spiking on Base right now?"* or *"check attention 
 
 ## What you get
 
-- **Radar sweep** — what's moving across all 62 tracked Base tokens right now
+- **Radar sweep** — what's moving across tracked Base tokens right now
 - **Token deep dive** — ATT deltas, price, divergence signal, narrative summary
 - **Leaderboard** — top 10 by attention share or growth (sortable: ATT_pct, ATT_delta, velocity — configurable 1-24h windows)
 - **Rotation** — directed creator graph: which accounts moved between tokens, with inflow/outflow per token and named attribution (1h or 4h window)
-- **Bankr agents dashboard** — competitive intelligence for 19 bankr agents, sortable by ATT_pct, ATT_delta, or velocity
+- **Bankr agents dashboard** — competitive intelligence for bankr agents, sortable by ATT_pct, ATT_delta, or velocity
 - **Divergence detection** — when attention and price are moving in opposite directions
 - **Always fresh** — data computed from DB on every request (1-2s response time, no stale cache)
 

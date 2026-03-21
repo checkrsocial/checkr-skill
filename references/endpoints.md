@@ -78,7 +78,7 @@
 **Price:** $0.05/call  
 **Params:** `?hours=1|2|4|8|12|24` (default 4, optional)
 
-Competitive intelligence dashboard for bankr agents. Shows attention metrics for all 19 tracked bankr agents with dual normalization: bankr-relative (ATT_pct) and full Base context (ATT_base).
+Competitive intelligence dashboard for bankr agents. Dual normalization: bankr-relative (ATT_pct) and full Base context (ATT_base).
 
 
 ```json
@@ -86,8 +86,6 @@ Competitive intelligence dashboard for bankr agents. Shows attention metrics for
   "updated_at": "2026-03-14T20:15:41.900167+00:00",
   "data_age_minutes": 0.0,
   "window_hours": 4,
-  "agents_tracked": 19,
-  "active_agents": 8,
   "total_attention_share": 25.0,
   "leaderboard": [
     {
@@ -145,6 +143,61 @@ Competitive intelligence dashboard for bankr agents. Shows attention metrics for
 - Trading signals: "Which agents are spiking right now?"
 
 **Tracked agents:** All active bankr agents. Universe is dynamically managed — agents are added and removed as activity changes.
+
+---
+
+## GET /v1/rotation
+
+**Price:** $0.10/call  
+**Params:** `?window=1h|4h` (default 4h), `?limit=1-25` (default 10)
+
+Directed creator rotation graph. Shows which accounts moved between tokens in the window — actual chronological transitions, not snapshot comparisons. Each edge is a creator who posted about token A then token B. Inflow/outflow per token shows where attention is flowing.
+
+```json
+{
+  "updated_at": "2026-03-21T14:22:43Z",
+  "data_age_minutes": 8.5,
+  "window": "4h",
+  "edges": [
+    {
+      "from": "CLAWNCH",
+      "to": "MOLTEN",
+      "weight": 2,
+      "creators": [
+        { "username": "@adamsornaghi", "followers": 1206 },
+        { "username": "@booksbandsforev", "followers": 1108 }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "symbol": "MOLTEN",
+      "inflow": 3,
+      "outflow": 1,
+      "post_count": 14,
+      "net_flow": 2
+    },
+    {
+      "symbol": "CLAWNCH",
+      "inflow": 1,
+      "outflow": 4,
+      "post_count": 27,
+      "net_flow": -3
+    }
+  ]
+}
+```
+
+**Fields:**
+- `edges` — directed creator transitions sorted by weight (creator count) descending
+- `edges[].from / to` — token symbols for the transition
+- `edges[].weight` — number of distinct creators who made this transition
+- `edges[].creators` — named accounts (sorted by followers), max 5 per edge
+- `nodes` — all tokens with activity in the window, sorted by inflow descending
+- `nodes[].inflow` — unique creators arriving from other tokens
+- `nodes[].outflow` — unique creators leaving to other tokens
+- `nodes[].net_flow` — inflow minus outflow (positive = net gaining creators)
+- `nodes[].post_count` — total posts in window for this token
 
 ---
 
