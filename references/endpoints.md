@@ -159,59 +159,46 @@ Quality filters applied: minimum follower threshold, engagement floor (≥10 lik
 
 ```json
 {
-  "updated_at": "2026-03-21T16:53:04Z",
-  "data_age_minutes": 2.3,
+  "updated_at": "2026-03-21T17:52:46Z",
+  "data_age_minutes": 4.2,
   "window": "4h",
   "edges": [
     {
-      "from": "TIBBIR",
-      "to": "TOSHI",
+      "from": "INSTACLAW",
+      "to": "ODAI",
       "weight": 1,
-      "creators": [
-        { "username": "@0x_base", "followers": 2584 }
-      ]
-    },
-    {
-      "from": "ANTIHUNTER",
-      "to": "BOTCOIN",
-      "weight": 1,
-      "creators": [
-        { "username": "@onurdayolu9645", "followers": 1167 }
-      ]
+      "top_creator": {
+        "username": "@thebasedfrogx",
+        "followers": 2486,
+        "max_likes": 11
+      }
     }
   ],
   "nodes": [
     {
-      "symbol": "TOSHI",
+      "symbol": "ODAI",
       "inflow": 1,
       "outflow": 0,
-      "post_count": 32,
+      "post_count": 18,
       "net_flow": 1,
-      "ATT_growth": 42.5
-    },
-    {
-      "symbol": "BOTCOIN",
-      "inflow": 2,
-      "outflow": 0,
-      "post_count": 4,
-      "net_flow": 2,
-      "ATT_growth": 18.3
+      "ATT_growth": 34.2
     }
   ]
 }
 ```
 
 **Fields:**
-- `edges` — directed creator transitions sorted by weight (creator count) descending
+- `edges` — directed creator transitions involving confirmed nodes, sorted by weight descending
 - `edges[].from / to` — token symbols for the transition
 - `edges[].weight` — number of distinct creators who made this transition
-- `edges[].creators` — named accounts (sorted by followers), max 5 per edge
-- `nodes` — tokens with rotation activity, sorted by inflow descending
+- `edges[].top_creator` — highest-signal creator for this edge (ranked by likes on destination token, followers as tiebreaker)
+- `edges[].top_creator.max_likes` — likes on the creator's best post for the destination token
+- `nodes` — tokens with confirmed rotation (default), sorted by inflow descending
 - `nodes[].inflow` — unique creators arriving from other tokens
 - `nodes[].outflow` — unique creators leaving to other tokens
 - `nodes[].net_flow` — inflow minus outflow (positive = net gaining creators)
 - `nodes[].post_count` — total posts in window for this token
-- `nodes[].ATT_growth` — relative attention growth % over the window (e.g. 42.5 = ATT up 42.5%). null if no baseline available
+- `nodes[].ATT_growth` — relative attention growth % over the window (e.g. 34.2 = ATT up 34.2%). null if no baseline available
 
 ---
 
