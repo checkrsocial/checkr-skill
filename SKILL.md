@@ -21,10 +21,11 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 
 | Endpoint | Price | What it returns |
 |---|---|---|
-| `GET /v1/leaderboard` | $0.02 | Top Base tokens ranked by social attention share |
+| `GET /v1/leaderboard` | $0.02 | Top Base tokens ranked by attention share or growth (`sort_by=ATT_delta\|velocity`) |
 | `GET /v1/spikes` | $0.05 | Tokens currently velocity-spiking (the radar sweep) |
+| `GET /v1/rotation` | $0.10 | Top gainers + losers by ATT delta with named creator crossover evidence |
 | `GET /v1/token/{symbol}` | $0.50 | Deep dive: ATT deltas, price, divergence, narrative |
-| `GET /v1/bankr` | $0.02 | Attention leaderboard for the bankr agent ecosystem |
+| `GET /v1/bankr` | $0.05 | Attention leaderboard for the bankr agent ecosystem (`sort_by=ATT_pct\|ATT_delta\|velocity`) |
 
 Full response schemas and field definitions: `https://api.checkr.social/docs`
 
@@ -96,7 +97,10 @@ detail = client.get(f"https://api.checkr.social/v1/token/{top}").json()
 
 ```
 GET /v1/leaderboard?limit=10&sort_by=ATT_pct&min_mentions=5
+GET /v1/leaderboard?sort_by=ATT_delta&hours=4
 GET /v1/spikes?min_velocity=3.0&min_mentions=10&divergence_only=false
+GET /v1/rotation?window=4h&limit=10
+GET /v1/bankr?sort_by=ATT_delta&hours=4
 ```
 
 ## Requirements

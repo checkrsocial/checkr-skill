@@ -26,8 +26,9 @@ Then ask your agent: *"what's spiking on Base right now?"* or *"check attention 
 
 - **Radar sweep** — what's moving across all 62 tracked Base tokens right now
 - **Token deep dive** — ATT deltas, price, divergence signal, narrative summary
-- **Leaderboard** — top 10 by attention share with trend direction (configurable 1-24h windows)
-- **Bankr agents dashboard** — competitive intelligence for 19 bankr agents (configurable 1-24h windows)
+- **Leaderboard** — top 10 by attention share or growth (sortable: ATT_pct, ATT_delta, velocity — configurable 1-24h windows)
+- **Rotation** — top gainers and losers by ATT delta, with named creator crossover evidence (who moved between tokens)
+- **Bankr agents dashboard** — competitive intelligence for 19 bankr agents, sortable by ATT_pct, ATT_delta, or velocity
 - **Divergence detection** — when attention and price are moving in opposite directions
 - **Always fresh** — data computed from DB on every request (1-2s response time, no stale cache)
 
@@ -52,9 +53,10 @@ print(token["narrative"]["summary"])
 
 | Endpoint | Price | Description |
 |---|---|---|
-| `GET /v1/leaderboard` | $0.02 | Top 10 Base tokens by attention share |
+| `GET /v1/leaderboard` | $0.02 | Top Base tokens by attention share or growth (`sort_by=ATT_delta`) |
 | `GET /v1/spikes` | $0.05 | Active velocity spikes across all tokens |
-| `GET /v1/bankr` | $0.05 | Bankr agents competitive dashboard |
+| `GET /v1/rotation` | $0.10 | Attention rotation — gainers/losers with named creator crossover evidence |
+| `GET /v1/bankr` | $0.05 | Bankr agents dashboard, sortable by ATT_pct, ATT_delta, or velocity |
 | `GET /v1/token/{symbol}` | $0.50 | Full attention snapshot for one token |
 
 ## Requirements
@@ -74,6 +76,9 @@ print(token["narrative"]["summary"])
 - *"Show me the bankr agents leaderboard"*
 - *"Which bankr agent is dominating attention right now?"*
 - *"What's the biggest gainer among bankr agents in the last 4h?"*
+- *"What's rotating on Base right now?"*
+- *"Which tokens are bleeding attention and where are creators going?"*
+- *"Show me attention rotation over the last 2 hours"*
 
 ## API reference
 
