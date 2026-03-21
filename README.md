@@ -55,7 +55,7 @@ print(token["narrative"]["summary"])
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top Base tokens by attention share or growth (`sort_by=ATT_delta`) |
 | `GET /v1/spikes` | $0.05 | Active velocity spikes across all tokens |
-| `GET /v1/rotation` | $0.10 | Directed creator rotation graph — token inflow/outflow with named account attribution (1h\|4h) |
+| `GET /v1/rotation` | $0.10 | Directed creator rotation graph with confirmed ATT growth — token inflow/outflow with named account attribution (1h\|4h) |
 | `GET /v1/bankr` | $0.05 | Bankr agents dashboard, sortable by ATT_pct, ATT_delta, or velocity |
 | `GET /v1/token/{symbol}` | $0.50 | Full attention snapshot for one token |
 

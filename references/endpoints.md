@@ -149,40 +149,53 @@ Competitive intelligence dashboard for bankr agents. Dual normalization: bankr-r
 ## GET /v1/rotation
 
 **Price:** $0.10/call  
-**Params:** `?window=1h|4h` (default 4h), `?limit=1-25` (default 10)
+**Params:** `?window=1h|4h` (default 4h), `?limit=1-25` (default 10), `?confirmed_only=true|false` (default true)
 
-Directed creator rotation graph. Shows which accounts moved between tokens in the window — actual chronological transitions, not snapshot comparisons. Each edge is a creator who posted about token A then token B. Inflow/outflow per token shows where attention is flowing.
+Directed creator rotation graph. Shows which accounts moved between tokens in the window — actual chronological transitions, not snapshot comparisons. Each edge is a creator who posted about token A then token B.
+
+When `confirmed_only=true` (default), only returns nodes where rotation actually converted to attention growth: `net_flow > 0` AND `ATT_growth > 0`. This filters noise and surfaces confirmed alpha only. Set `confirmed_only=false` to see all rotation activity.
+
+Quality filters applied: minimum follower threshold, engagement floor (≥10 likes), view fraud detection, scanner account exclusion.
 
 ```json
 {
-  "updated_at": "2026-03-21T14:22:43Z",
-  "data_age_minutes": 8.5,
+  "updated_at": "2026-03-21T16:53:04Z",
+  "data_age_minutes": 2.3,
   "window": "4h",
   "edges": [
     {
-      "from": "CLAWNCH",
-      "to": "MOLTEN",
-      "weight": 2,
+      "from": "TIBBIR",
+      "to": "TOSHI",
+      "weight": 1,
       "creators": [
-        { "username": "@adamsornaghi", "followers": 1206 },
-        { "username": "@booksbandsforev", "followers": 1108 }
+        { "username": "@0x_base", "followers": 2584 }
+      ]
+    },
+    {
+      "from": "ANTIHUNTER",
+      "to": "BOTCOIN",
+      "weight": 1,
+      "creators": [
+        { "username": "@onurdayolu9645", "followers": 1167 }
       ]
     }
   ],
   "nodes": [
     {
-      "symbol": "MOLTEN",
-      "inflow": 3,
-      "outflow": 1,
-      "post_count": 14,
-      "net_flow": 2
+      "symbol": "TOSHI",
+      "inflow": 1,
+      "outflow": 0,
+      "post_count": 32,
+      "net_flow": 1,
+      "ATT_growth": 42.5
     },
     {
-      "symbol": "CLAWNCH",
-      "inflow": 1,
-      "outflow": 4,
-      "post_count": 27,
-      "net_flow": -3
+      "symbol": "BOTCOIN",
+      "inflow": 2,
+      "outflow": 0,
+      "post_count": 4,
+      "net_flow": 2,
+      "ATT_growth": 18.3
     }
   ]
 }
@@ -193,11 +206,12 @@ Directed creator rotation graph. Shows which accounts moved between tokens in th
 - `edges[].from / to` — token symbols for the transition
 - `edges[].weight` — number of distinct creators who made this transition
 - `edges[].creators` — named accounts (sorted by followers), max 5 per edge
-- `nodes` — all tokens with activity in the window, sorted by inflow descending
+- `nodes` — tokens with rotation activity, sorted by inflow descending
 - `nodes[].inflow` — unique creators arriving from other tokens
 - `nodes[].outflow` — unique creators leaving to other tokens
 - `nodes[].net_flow` — inflow minus outflow (positive = net gaining creators)
 - `nodes[].post_count` — total posts in window for this token
+- `nodes[].ATT_growth` — relative attention growth % over the window (e.g. 42.5 = ATT up 42.5%). null if no baseline available
 
 ---
 

@@ -23,7 +23,7 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top Base tokens ranked by attention share or growth (`sort_by=ATT_delta\|velocity`) |
 | `GET /v1/spikes` | $0.05 | Tokens currently velocity-spiking (the radar sweep) |
-| `GET /v1/rotation` | $0.10 | Top gainers + losers by ATT delta with named creator crossover evidence |
+| `GET /v1/rotation` | $0.10 | Directed creator rotation graph with confirmed ATT growth. `confirmed_only=true` (default) returns only tokens where inflow converted to attention increase |
 | `GET /v1/token/{symbol}` | $0.50 | Deep dive: ATT deltas, price, divergence, narrative |
 | `GET /v1/bankr` | $0.05 | Attention leaderboard for the bankr agent ecosystem (`sort_by=ATT_pct\|ATT_delta\|velocity`) |
 
