@@ -25,7 +25,7 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top Base tokens ranked by attention share — macro orientation |
 | `GET /v1/signal` | $0.15 | Cross-universe radar — ranked opportunities with composite scoring, timing, and signal_interpretation |
-| `GET /v1/token/{symbol}` | $0.45 | Full deep dive: attention, live price, hawkes, timing, narrative, spike history |
+| `GET /v1/token/{symbol_or_ca}` | $0.45 | Full deep dive: attention, live price, hawkes, timing, narrative, spike history (accepts symbol or Base contract address) |
 | `GET /v1/rotation` | $0.10 | Directed creator rotation graph with confirmed ATT growth |
 | `GET /v1/bankr` | $0.05 | Bankr agent universe attention dashboard |
 
@@ -59,7 +59,9 @@ spikes = client.get("https://api.checkr.social/v1/signal?spiking_only=true").jso
 leaderboard = client.get("https://api.checkr.social/v1/leaderboard").json()
 
 # full deep dive on a token — includes timing ($0.45)
+# can pass symbol or contract address
 token = client.get("https://api.checkr.social/v1/token/BNKR").json()
+# or: token = client.get("https://api.checkr.social/v1/token/0xa1f72459dfa10bad200ac160ecd78c6b77a747be").json()
 ```
 
 **TypeScript:**
@@ -86,6 +88,7 @@ open_signals = [s for s in signal["signals"] if s["timing"]["window_open"]]
 # 3. Deep dive on the top opportunity — includes timing, hawkes, price ($0.45)
 top = open_signals[0]["symbol"]
 detail = client.get(f"https://api.checkr.social/v1/token/{top}").json()
+# or use contract address: detail = client.get("https://api.checkr.social/v1/token/0xa1f...").json()
 # → full attention, price, divergence, hawkes, timing, spike_history, narrative
 
 # Total: $0.60 for a complete decision

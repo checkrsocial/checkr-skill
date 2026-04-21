@@ -47,8 +47,10 @@ client = x402_client(
 signal = client.get("https://api.checkr.social/v1/signal").json()
 
 # filter to open windows, drill into top result ($0.45)
+# can pass symbol or contract address
 top = next(s for s in signal["signals"] if s["timing"]["window_open"])["symbol"]
 token = client.get(f"https://api.checkr.social/v1/token/{top}").json()
+# or by CA: token = client.get("https://api.checkr.social/v1/token/0xa1f72459dfa10bad200ac160ecd78c6b77a747be").json()
 
 # full sweep cost: $0.60
 ```
@@ -59,7 +61,7 @@ token = client.get(f"https://api.checkr.social/v1/token/{top}").json()
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top Base tokens by attention share — macro orientation |
 | `GET /v1/signal` | $0.15 | Cross-universe radar — ranked signals with composite scoring and timing |
-| `GET /v1/token/{symbol}` | $0.45 | Full deep dive: attention, price, hawkes, timing, narrative, spike history |
+| `GET /v1/token/{symbol_or_ca}` | $0.45 | Full deep dive: attention, price, hawkes, timing, narrative, spike history (accepts symbol or Base contract address) |
 | `GET /v1/rotation` | $0.10 | Directed creator rotation graph with ATT growth confirmation |
 | `GET /v1/bankr` | $0.05 | Bankr agent universe attention dashboard |
 
