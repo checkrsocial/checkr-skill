@@ -3,9 +3,10 @@ name: checkr
 description: |
   Access real-time X/Twitter attention intelligence for Base chain tokens via the checkr API.
   Use when you need to know what is trending on CT, which tokens are spiking in social attention,
-  get attention/price divergence signals, or fetch narrative summaries for specific Base tokens.
+  get attention/price divergence signals, fetch entry/exit timing, or research specific Base tokens.
   Triggers: "what's trending on Base", "check attention for $TOKEN", "what's spiking right now",
-  "social signal for X", any token research needing CT attention data.
+  "best signal on Base", "is the window open for $X", "social signal for X",
+  any token research needing CT attention data or Hawkes-modeled signal quality.
   Payments via x402 — USDC on Base, no API key or account needed.
 ---
 
@@ -15,7 +16,8 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 
 **Base URL:** `https://api.checkr.social`  
 **Docs:** `https://api.checkr.social/docs`  
-**Payment:** x402 — USDC on Base mainnet, pay-per-call, no account needed.
+**Payment:** x402 — USDC on Base mainnet, pay-per-call, no account needed.  
+**Version:** v3.0.0
 
 ## Endpoints
 

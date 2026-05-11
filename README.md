@@ -1,22 +1,20 @@
 # checkr skill
 
-Real-time X attention intelligence for Base coins. Works with OpenClaw and Claude Code.
+Real-time X/Twitter attention intelligence for Base chain tokens. Works with OpenClaw and Claude Code.
 
-Track mention velocity, attention share, active narrative spikes, attention/price divergence, and competitive intelligence for bankr agents — updated every 30 minutes from the live CT feed.
+Track mention velocity, attention share, Hawkes-modeled signal quality, entry/exit timing, and creator rotation — updated every 30 minutes from the live CT feed.
 
 ## Install
 
 ```bash
-# From your workspace
-mkdir -p skills
-cd skills
+# OpenClaw workspace
+mkdir -p skills && cd skills
 git clone https://github.com/checkrsocial/checkr-skill.git checkr
 ```
 
 ```bash
-# From your project (.claude/skills)
-mkdir -p .claude/skills
-cd .claude/skills
+# Claude Code (.claude/skills)
+mkdir -p .claude/skills && cd .claude/skills
 git clone https://github.com/checkrsocial/checkr-skill.git checkr
 ```
 
@@ -236,7 +234,8 @@ Payments via x402 — USDC on Base mainnet, pay-per-call. No subscription. No AP
 
 ## Example queries
 
-- *"What's trending on Base right now?"*
+- *"What's the best signal on Base right now?"*
+- *"What's building with an open entry window?"*
 - *"Check attention for $BNKR"*
 - *"What's spiking with the strongest signal?"*
 - *"Is $TIBBIR attention diverging from price?"*
@@ -247,15 +246,18 @@ Payments via x402 — USDC on Base mainnet, pay-per-call. No subscription. No AP
 - *"Which bankr agent is dominating attention right now?"*
 - *"What's the biggest gainer among bankr agents in the last 4h?"*
 - *"What's rotating on Base right now?"*
-- *"Which tokens are bleeding attention and where are creators going?"*
-- *"Show me attention rotation over the last hour"*
+- *"Which bankr agent is dominating attention?"*
+- *"Has $TIBBIR had any confirmed spikes recently?"*
+- *"What's the cascade size on this spike — is it worth entering?"*
 
 ## API reference
 
-See [references/endpoints.md](references/endpoints.md) for full response schemas and signal interpretation guide.
+Full field definitions, response schemas, and the `signal_interpretation` guide: [api.checkr.social/docs](https://api.checkr.social/docs)
+
+See also [references/endpoints.md](references/endpoints.md) for detailed field tables.
 
 ## About checkr
 
-checkr is an attention intelligence layer for Base coins. It reads every post so you don't have to. Tracking attention before it becomes price: mention velocity, narrative clusters, account weight, and attention/price correlation.
+checkr is an attention intelligence layer for Base. It reads every post so you don't have to — tracking attention before it becomes price: mention velocity, Hawkes-modeled cascade dynamics, narrative clusters, account weight, and attention/price correlation.
 
 [api.checkr.social/docs](https://api.checkr.social/docs) · [X](https://x.com/checkrsocial)
