@@ -13,6 +13,45 @@ from typing import Optional
 WORKSPACE = Path(__file__).parent.parent.parent
 
 
+def _is_primary_subject(text: str, symbol: str) -> bool:
+    """Check if the symbol is the primary subject, not just a co-mention.
+    
+    Rules:
+    - If it's the FIRST cashtag → primary ✓
+    - If it's in the first 100 chars → primary ✓
+    - If it appears 3+ cashtags in → secondary ✗
+    - Otherwise → edge cases treated as primary (benefit of doubt)
+    """
+    if not text:
+        return False
+    
+    text_lower = text.lower()
+    symbol_lower = f"${symbol.lower()}"
+    
+    import re
+    cashtags = re.findall(r'\$[A-Za-z0-9]+', text, re.IGNORECASE)
+    
+    if not cashtags:
+        return False
+    
+    # Rule 1: If this is the FIRST cashtag, it's primary
+    if cashtags[0].lower() == symbol_lower:
+        return True
+    
+    # Rule 2: If it appears in the first 100 chars, it's primary
+    if symbol_lower in text_lower[:100]:
+        return True
+    
+    # Rule 3: Count how many cashtags appear before it
+    position_index = next((i for i, tag in enumerate(cashtags) if tag.lower() == symbol_lower), None)
+    if position_index is not None and position_index >= 3:
+        # If it's the 4th or later cashtag, it's a co-mention
+        return False
+    
+    # Default: include it (benefit of doubt for edge cases)
+    return True
+
+
 def _get_posts_all_sources(symbol: str, hours: int = 48, limit: int = 50) -> list:
     """
     Fetch posts from ALL queries for this symbol:
@@ -43,7 +82,7 @@ def _get_posts_all_sources(symbol: str, hours: int = 48, limit: int = 50) -> lis
 
         start = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
 
-        # Get cashtag posts
+        # Get cashtag posts (filter to primary mentions only)
         if cashtag_rows:
             qid = cashtag_rows[0][0]
             posts_rows = con.execute(
@@ -51,13 +90,19 @@ def _get_posts_all_sources(symbol: str, hours: int = 48, limit: int = 50) -> lis
                    FROM x_posts
                    WHERE query_id=? AND created_at > ? AND (is_spam IS NULL OR is_spam=0)
                    ORDER BY created_at DESC LIMIT ?""",
-                (qid, start, limit)
+                (qid, start, limit * 3)  # Fetch 3x to filter
             ).fetchall()
             
             for row in posts_rows:
-                all_posts.append(_parse_post_row(row, is_dev=False))
+                text = row[0]
+                # FILTER: only include if symbol is primary subject (not co-mention)
+                if not _is_primary_subject(text, symbol):
+                    continue
+                parsed = _parse_post_row(row, is_dev=False)
+                if parsed:
+                    all_posts.append(parsed)
 
-        # Get dev posts (prioritize these)
+        # Get dev posts (prioritize these, also filter)
         if dev_rows:
             qid = dev_rows[0][0]
             posts_rows = con.execute(
@@ -65,11 +110,17 @@ def _get_posts_all_sources(symbol: str, hours: int = 48, limit: int = 50) -> lis
                    FROM x_posts
                    WHERE query_id=? AND created_at > ? AND (is_spam IS NULL OR is_spam=0)
                    ORDER BY created_at DESC LIMIT ?""",
-                (qid, start, limit)
+                (qid, start, limit * 2)
             ).fetchall()
             
             for row in posts_rows:
-                all_posts.append(_parse_post_row(row, is_dev=True))
+                text = row[0]
+                # FILTER: only include if symbol is primary subject
+                if not _is_primary_subject(text, symbol):
+                    continue
+                parsed = _parse_post_row(row, is_dev=True)
+                if parsed:
+                    all_posts.append(parsed)
 
         con.close()
 

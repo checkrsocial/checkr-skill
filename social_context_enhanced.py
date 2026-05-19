@@ -180,6 +180,11 @@ def extract_feed_themes(posts: list) -> dict:
 
 
 def build_feed_summary(symbol: str, hours: int = 4) -> dict:
+    """Build feed summary from the FULL window (4h or 24h), not just recent 2h.
+    
+    The narrative should represent what the entire lookback window is saying,
+    not just what happened in the last 2 hours.
+    """
     """
     Build a narrative summary of what the feed is actually saying.
     
