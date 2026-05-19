@@ -35,6 +35,103 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 
 Full response schemas and field definitions: `https://api.checkr.social/docs`
 
+## Social Context Layer (NEW)
+
+`/v1/token/{symbol}` now includes a **`social_context`** field with 9 subsections of feed intelligence:
+
+### Social Context Structure
+
+```json
+{
+  "social_context": {
+    "now": {
+      "window": "2h",
+      "mentions_count": 42,
+      "unique_authors": 18,
+      "ATT_pct": 8.7,
+      "velocity": 4.2,
+      "engagement_avg": 14.3,
+      "has_founder_post": true,
+      "top_account": { "username": "@0xDeployer", "followers": 45000 }
+    },
+    "trend": {
+      "direction": "building",
+      "att_pct_24h_ago": 3.2,
+      "att_pct_now": 8.7,
+      "att_growth_pp": 5.5,
+      "att_growth_pct": 172,
+      "mentions_24h": 184,
+      "authors_trend": { "24h_ago": 8, "now": 18, "net_change": 10 }
+    },
+    "timeline": {
+      "description": "72h graph of attention",
+      "datapoints": [
+        { "hours_ago": 72, "ATT_pct": 1.1, "mentions": 8, "authors": 3 },
+        { "hours_ago": 48, "ATT_pct": 2.4, "mentions": 22, "authors": 7 },
+        ...
+      ]
+    },
+    "narratives": [
+      {
+        "theme": "Infrastructure for agentic VC",
+        "accounts": ["@0xDeployer", "@ChillTRD"],
+        "quotes": [
+          "autonomous agent infrastructure is the next wave",
+          "shipping the rails for agent swarms"
+        ],
+        "momentum": "building"
+      }
+    ],
+    "top_accounts": [
+      { "username": "@0xDeployer", "followers": 45000, "posts": 3, "engagement_total": 89 },
+      { "username": "@ChillTRD", "followers": 12000, "posts": 2, "engagement_total": 45 }
+    ],
+    "recent_posts": [
+      {
+        "author": "@0xDeployer",
+        "text": "shipping infrastructure for agents...",
+        "likes": 127,
+        "replies": 34,
+        "posted": "12m ago"
+      }
+    ],
+    "momentum_signature": {
+      "organic_pct": 0.78,
+      "exogenous_pct": 0.22,
+      "interpretation": "Community-driven, with some coordinated entry"
+    },
+    "feed_summary": {
+      "themes": ["agent infrastructure", "VC thesis", "autonomous swarms"],
+      "sentiment": "bullish",
+      "credibility": "high (founder + quality accounts)",
+      "text": "Builder-focused narrative with strong conviction. Dev team actively shipping. Ecosystem plays are emerging."
+    },
+    "dev_context": {
+      "dev_posts": 2,
+      "dev_narrative": "Shipping agent-native infrastructure: terminal, managed filesystem, shared skills layer.",
+      "community_posts": 12,
+      "community_narrative": "Foundational play for the agentic economy. Infrastructure for autonomous agents.",
+      "sentiment": "aligned",
+      "post_distribution": { "macro": 2, "micro": 8, "nano": 4 }
+    }
+  }
+}
+```
+
+### What It Shows
+
+- **now** — Current 2h snapshot: mentions, unique voices, velocity, top accounts
+- **trend** — 24h direction: is attention growing, stable, or fading?
+- **timeline** — 72h sparkline: when did the momentum start?
+- **narratives** — Thematic clusters: what is the feed organizing around?
+- **top_accounts** — Ranked by influence on this coin: who's driving it?
+- **recent_posts** — Top 10 posts in the window: the raw feed signal
+- **momentum_signature** — Organic vs exogenous: community-driven or coordinated?
+- **feed_summary** — One-sentence synthesis: themes, sentiment, credibility signal
+- **dev_context** — Developer posts separated from community: what's the team shipping?
+
+All original fields remain intact. **Backward compatible: 100%.**
+
 ## How to Call (x402)
 
 x402 is pay-per-call. No API key or account. Wallet + USDC on Base is all you need.
