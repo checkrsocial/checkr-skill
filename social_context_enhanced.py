@@ -14,8 +14,50 @@ from typing import Optional
 WORKSPACE = Path(__file__).parent.parent.parent
 
 
+def _is_primary_subject(text: str, symbol: str) -> bool:
+    """Check if the symbol is the primary subject, not just a co-mention.
+    
+    Rules:
+    - If it's the FIRST cashtag → primary ✓
+    - If it's in the first 100 chars → primary ✓
+    - If it appears 3+ cashtags in → secondary ✗
+    - Otherwise → edge cases treated as primary (benefit of doubt)
+    """
+    if not text:
+        return False
+    
+    text_lower = text.lower()
+    symbol_lower = f"${symbol.lower()}"
+    
+    import re
+    cashtags = re.findall(r'\$[A-Za-z0-9]+', text, re.IGNORECASE)
+    
+    if not cashtags:
+        return False
+    
+    # Rule 1: If this is the FIRST cashtag, it's primary
+    if cashtags[0].lower() == symbol_lower:
+        return True
+    
+    # Rule 2: If it appears in the first 100 chars, it's primary
+    if symbol_lower in text_lower[:100]:
+        return True
+    
+    # Rule 3: Count how many cashtags appear before it
+    position_index = next((i for i, tag in enumerate(cashtags) if tag.lower() == symbol_lower), None)
+    if position_index is not None and position_index >= 3:
+        # If it's the 4th or later cashtag, it's a co-mention
+        return False
+    
+    # Default: include it (benefit of doubt for edge cases)
+    return True
+
+
 def _get_posts_with_text(symbol: str, hours: int = 4, limit: int = 20) -> list:
-    """Fetch recent posts with full text, ranked by engagement."""
+    """Fetch recent posts with full text, ranked by engagement.
+    
+    Filters to posts where the symbol is the PRIMARY subject, not just a co-mention.
+    """
     try:
         from attention import x_db
         con = x_db.connect()
@@ -37,13 +79,17 @@ def _get_posts_with_text(symbol: str, hours: int = 4, limit: int = 20) -> list:
                FROM x_posts
                WHERE query_id=? AND created_at > ? AND (is_spam IS NULL OR is_spam=0)
                ORDER BY created_at DESC LIMIT ?""",
-            (qid, start, limit)
+            (qid, start, limit * 3)  # Fetch 3x to filter for primary mentions
         ).fetchall()
         con.close()
 
         posts = []
         for text, author_json, metrics_json, created_at in posts_rows:
             try:
+                # Filter: only include if symbol is the primary subject
+                if not _is_primary_subject(text, symbol):
+                    continue
+                
                 metrics = json.loads(metrics_json or "{}")
                 author = json.loads(author_json or "{}")
                 likes = metrics.get("like_count", 0)
@@ -68,6 +114,10 @@ def _get_posts_with_text(symbol: str, hours: int = 4, limit: int = 20) -> list:
                     "retweets": metrics.get("retweet_count", 0),
                     "created_at": created_at,
                 })
+                
+                if len(posts) >= limit:
+                    break
+                    
             except Exception:
                 continue
 
