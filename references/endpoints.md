@@ -76,6 +76,7 @@ Cross-universe opportunity radar. Scores every token, returns ranked list with t
 | `?spiking_only=` | bool | false — shorthand for min_velocity=3.0 |
 | `?divergence_only=` | bool | false — only tokens where attention up, price flat/down |
 | `?require_history=` | bool | false — only tokens with ≥5 historical spikes |
+| `?include_narrative=` | bool | false — include 80-120 char lightweight narrative per signal |
 
 **Composite score formula:**
 ```
@@ -110,6 +111,9 @@ history_bonus    = 1.0 + (hit_rate × 0.5) if ≥5 historical spikes else 1.0
 | `signals[].caution` | array | Flags that temper the signal (e.g. `"half_life_under_1h"`, `"exogenous_heavy"`, `"high_influence_concentration"`) |
 | `signals[].timing` | object | Compact entry/exit window (see timing fields below) |
 | `signals[].signal_interpretation` | object | 7-field agent block (see section) |
+| `signals[].narrative` | string\|null | 80-120 char narrative (only when `?include_narrative=true`) |
+| `signals[].narrative_confidence` | float\|null | Confidence score 0–1 (only when `?include_narrative=true`) |
+| `signals[].narrative_method` | string\|null | `template` / `haiku_validate` / `heuristic` (only when `?include_narrative=true`) |
 
 **Timing fields (compact, in signal entries):**
 
@@ -181,6 +185,7 @@ Full deep dive on one token. Everything in one call: attention, live price, hawk
 | Param | Values | Default |
 |---|---|---|
 | `?hours=` | 1–168 | 4 — lookback for recent_posts and narrative |
+| `?include_narrative=` | bool | false — include lightweight narrative block `{ text, confidence, method }` |
 
 **Response structure:**
 
@@ -338,66 +343,7 @@ Directed creator rotation graph — which accounts moved between tokens, with AT
 }
 ```
 
----
 
-## GET /v1/bankr — $0.05
-
-Bankr agent universe attention dashboard — competitive intelligence for the bankr ecosystem.
-
-**Params:**
-
-| Param | Values | Default |
-|---|---|---|
-| `?hours=` | 1–24 | 4 |
-| `?sort_by=` | ATT_pct \| ATT_delta \| velocity | ATT_pct |
-
-**Response fields:**
-
-| Field | Type | Description |
-|---|---|---|
-| `leaderboard[].symbol` | string | Agent token symbol |
-| `leaderboard[].ATT_pct` | float | Attention share normalized within bankr universe (%) |
-| `leaderboard[].ATT_base` | float | Raw attention share in full Base ecosystem (%) |
-| `leaderboard[].ATT_delta` | float | Change in ATT_base vs prior window (pp) |
-| `leaderboard[].velocity` | float | Momentum multiplier vs baseline |
-| `leaderboard[].mentions` | int | Mentions in window |
-| `leaderboard[].unique_authors` | int | Distinct posting accounts |
-| `leaderboard[].rank` | int | Position within bankr universe |
-| `leaderboard[].fee_revenue_24h` | float\|null | 24h fee revenue USD (GeckoTerminal) |
-| `leaderboard[].signal_interpretation` | object | 7-field agent block |
-| `total_attention_share` | float | Combined Base ecosystem ATT% for all bankr agents |
-
-**Example response:**
-```json
-{
-  "updated_at": "2026-04-10T13:03:01Z",
-  "data_age_minutes": 0.0,
-  "window_hours": 4,
-  "total_attention_share": 22.4,
-  "leaderboard": [
-    {
-      "symbol": "gitlawb",
-      "ATT_pct": 44.6,
-      "ATT_base": 12.4,
-      "ATT_delta": 0.3,
-      "velocity": 4.2,
-      "mentions": 11,
-      "unique_authors": 11,
-      "rank": 1,
-      "fee_revenue_24h": 312.50,
-      "signal_interpretation": {
-        "propagation_mode": "organic",
-        "followthrough": "uncertain",
-        "decay_risk": "low",
-        "flow_type": "mixed",
-        "price_alignment": "roughly_aligned",
-        "summary": "building",
-        "agent_action_hint": "monitor"
-      }
-    }
-  ]
-}
-```
 
 ---
 

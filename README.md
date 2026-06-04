@@ -26,7 +26,6 @@ Then ask your agent: *"what's spiking on Base right now?"* or *"check attention 
 - **Token deep dive** — ATT deltas, price, divergence signal, narrative summary
 - **Leaderboard** — top tokens by attention share or growth (sortable: ATT_pct, ATT_delta, velocity — configurable 1-24h windows)
 - **Rotation** — directed creator graph: which accounts moved between tokens, with inflow/outflow per token and named attribution (1h or 4h window)
-- **Bankr agents dashboard** — competitive intelligence for bankr agents, sortable by ATT_pct, ATT_delta, or velocity
 - **Divergence detection** — when attention and price are moving in opposite directions
 - **Free 402 preview** — every paywalled endpoint returns a live teaser in the 402 body before you pay (top 3 tokens, top 2 spikes, or token att_pct/velocity)
 
@@ -217,10 +216,9 @@ The x402 client handles payment automatically — it reads the `PAYMENT-REQUIRED
 | Endpoint | Price | Description |
 |---|---|---|
 | `GET /v1/leaderboard` | $0.02 | Top Base tokens by attention share or growth (`sort_by=ATT_delta`) |
-| `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities with timing. Use `?spiking_only=true` for spike-only mode |
+| `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities with timing. Use `?spiking_only=true` for spike-only mode, `?include_narrative=true` for lightweight narratives |
 | `GET /v1/rotation` | $0.10 | Directed creator rotation graph with confirmed ATT growth — token inflow/outflow with named account attribution (1h\|4h) |
-| `GET /v1/bankr` | $0.05 | Bankr agents dashboard, sortable by ATT_pct, ATT_delta, or velocity |
-| `GET /v1/token/{symbol_or_ca}` | $0.45 | Full attention snapshot for one token — accepts symbol or Base contract address |
+| `GET /v1/token/{symbol_or_ca}` | $0.45 | Full attention snapshot for one token — accepts symbol or Base contract address. Use `?include_narrative=true` for a lightweight narrative |
 
 `/v1/spikes` is deprecated — it 308-redirects to `/v1/signal?spiking_only=true`.
 
@@ -242,11 +240,7 @@ Payments via x402 — USDC on Base mainnet, pay-per-call. No subscription. No AP
 - *"Show me the top 5 Base tokens by attention"*
 - *"Did $CLAWD attention grow in the last 4 hours?"*
 - *"Has $JUNO had any confirmed spikes recently?"*
-- *"Show me the bankr agents leaderboard"*
-- *"Which bankr agent is dominating attention right now?"*
-- *"What's the biggest gainer among bankr agents in the last 4h?"*
 - *"What's rotating on Base right now?"*
-- *"Which bankr agent is dominating attention?"*
 - *"Has $TIBBIR had any confirmed spikes recently?"*
 - *"What's the cascade size on this spike — is it worth entering?"*
 
