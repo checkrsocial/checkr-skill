@@ -27,9 +27,11 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 | `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities ranked by composite score, with timing. Use `?spiking_only=true` for spike-only mode (replaces `/v1/spikes`) |
 | `GET /v1/token/{symbol_or_ca}` | $0.45 | Full deep dive: attention, price, hawkes, timing, narrative, spike history. Accepts symbol (e.g. `BNKR`) or Base contract address |
 | `GET /v1/rotation` | $0.10 | Where creators are moving — directed rotation graph with ATT growth confirmation |
+| `GET /v1/creators/{symbol}` | $0.03 | Top 25 creators for a token — ranked by engagement, with follower tier and recent coin activity |
+| `GET /v1/creators/bankr` | $0.03 | Top creators in BANKR ecosystem (BNKR, BANKR, CLAWBANK, GITBANK) — aggregate or per-token mode |
 | `GET /v1/bankr` | $0.05 | Bankr agent universe attention dashboard |
 
-**Full sweep (all 5): $0.77**
+**Full sweep (all 7): $0.80**
 
 `/v1/spikes` is deprecated — it 308-redirects to `/v1/signal?spiking_only=true` for backward compatibility.
 
@@ -486,6 +488,119 @@ Every token response (signal + token deep dive) includes a `signal_interpretatio
 
 `agent_action_hint` — `"high_conviction"` / `"flag"` / `"monitor"` / `"deprioritize"` / `"rotate_out"`
 
+## GET /v1/creators/{symbol} — $0.03
+
+Top 25 creators (authors) posting about a specific token. Shows who's driving narrative and their reach.
+
+```json
+{
+  "symbol": "BNKR",
+  "in_bankr_ecosystem": true,
+  "creators": [
+    {
+      "username": "@Pogabyte",
+      "follower_count": 1051,
+      "tier": "micro",
+      "post_count": 28,
+      "avg_likes": 28.5,
+      "max_likes": 41,
+      "recent_coins": [
+        { "coin": "CLAWNCH", "timestamp": "2026-02-16T17:02:04Z" },
+        { "coin": "MOLTEN", "timestamp": "2026-02-16T18:13:26Z" },
+        { "coin": "BNKR", "timestamp": "2026-02-16T23:29:56Z" }
+      ],
+      "last_active": "2026-02-17T11:09:26Z"
+    },
+    {
+      "username": "@100xDarren",
+      "follower_count": 21528,
+      "tier": "macro",
+      "post_count": 13,
+      "avg_likes": 25.7,
+      "max_likes": 77,
+      "recent_coins": [
+        { "coin": "ANTIHUNTER", "timestamp": "2026-02-15T12:39:01Z" },
+        { "coin": "BNKR", "timestamp": "2026-02-14T10:59:12Z" }
+      ],
+      "last_active": "2026-02-15T21:31:49Z"
+    }
+  ],
+  "meta": {
+    "total_creators_found": 25,
+    "limit": 25,
+    "filters": {
+      "min_followers": 0,
+      "tier": "all"
+    }
+  }
+}
+```
+
+**Query params:**
+```
+GET /v1/creators/BNKR?limit=25&min_followers=0&tier_filter=all
+GET /v1/creators/BNKR?tier_filter=macro&limit=10        # macro voices only
+GET /v1/creators/VVV?min_followers=10000                # 10k+ followers
+```
+
+**Use cases:**
+- Identify top amplifiers for a token (who has biggest reach + engagement)
+- Filter by tier: `?tier_filter=macro` for opinion leaders
+- Spot multi-token narratives: see `recent_coins` to identify cross-token patterns
+- Track account engagement: `avg_likes` + `post_count` = narrative strength proxy
+
+---
+
+## GET /v1/creators/bankr — $0.03
+
+Top 25 creators in BANKR ecosystem (BNKR, BANKR, CLAWBANK, GITBANK combined). Two modes: aggregate (default, shows ambassadors) or per-token.
+
+```json
+{
+  "ecosystem": "BANKR",
+  "tokens": ["BNKR", "BANKR", "CLAWBANK", "GITBANK"],
+  "mode": "aggregate",
+  "top_creators": [
+    {
+      "username": "@soot_baler",
+      "follower_count": 376,
+      "tier": "nano",
+      "post_count": 9,
+      "avg_likes": 5.2,
+      "coins": ["BNKR", "CLAWBANK", "GITBANK"],
+      "last_active": "2026-02-19T21:30:27Z"
+    },
+    {
+      "username": "@latenightonbase",
+      "follower_count": 14227,
+      "tier": "macro",
+      "post_count": 6,
+      "avg_likes": 12.7,
+      "coins": ["BNKR", "BV7X"],
+      "last_active": "2026-06-18T22:01:54Z"
+    }
+  ],
+  "meta": {
+    "total_creators_found": 25,
+    "ecosystem_coverage": "98%"
+  }
+}
+```
+
+**Query params:**
+```
+GET /v1/creators/bankr                                   # aggregate: top creators across all 4 tokens
+GET /v1/creators/bankr?per_token=true&limit=10          # per-token: top 10 creators per token (3 groups)
+```
+
+**Use cases:**
+- Find ecosystem ambassadors (appear in multiple tokens)
+- Detect cross-token narratives: if same creator posts about BNKR + CLAWBANK + GITBANK, they're an ecosystem signal
+- Identify when single voices are driving entire ecosystem vs distributed participation
+- Track ecosystem health: high `ecosystem_coverage` = distributed (healthy), low = concentrated (risk)
+
+---
+
 ## Query Params
 
 ```
@@ -493,6 +608,8 @@ GET /v1/leaderboard?limit=10&sort_by=ATT_pct&min_mentions=5
 GET /v1/leaderboard?sort_by=ATT_delta&hours=4
 GET /v1/signal?spiking_only=true
 GET /v1/rotation?window=4h&limit=10
+GET /v1/creators/BNKR?tier_filter=macro&limit=10
+GET /v1/creators/bankr?per_token=true
 GET /v1/bankr?sort_by=ATT_delta&hours=4
 ```
 
