@@ -609,7 +609,9 @@ GET /v1/leaderboard?sort_by=ATT_delta&hours=4
 GET /v1/signal?spiking_only=true
 GET /v1/rotation?window=4h&limit=10
 GET /v1/creators/BNKR?tier_filter=macro&limit=10
-GET /v1/creators/bankr?per_token=true
+GET /v1/creators/BNKR?hours=24&limit=10                 # last 24h creators
+GET /v1/creators/BNKR?hours=168&tier_filter=macro       # last 7d macro voices
+GET /v1/creators/bankr?per_token=true&hours=72          # 3d per-token ecosystem
 GET /v1/bankr?sort_by=ATT_delta&hours=4
 ```
 
