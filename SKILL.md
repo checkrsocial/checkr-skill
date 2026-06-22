@@ -27,8 +27,8 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 | `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities ranked by composite score, with timing. Use `?spiking_only=true` for spike-only mode (replaces `/v1/spikes`) |
 | `GET /v1/token/{symbol_or_ca}` | $0.45 | Full deep dive: attention, price, hawkes, timing, narrative, spike history. Accepts symbol (e.g. `BNKR`) or Base contract address |
 | `GET /v1/rotation` | $0.10 | Where creators are moving — directed rotation graph with ATT growth confirmation |
-| `GET /v1/creators/{symbol}` | $0.03 | Top 25 creators for a token — ranked by engagement, with follower tier and recent coin activity |
-| `GET /v1/creators/bankr` | $0.03 | Top creators in BANKR ecosystem (BNKR, BANKR, CLAWBANK, GITBANK) — aggregate or per-token mode |
+| `GET /v1/creators/{symbol}` | $0.10 | Top 25 creators for a token — ranked by mindshare (% of conversation), with engagement + follower tier |
+| `GET /v1/creators/bankr` | $0.10 | Top creators in BANKR ecosystem (BNKR, BANKR, CLAWBANK, GITBANK) — ranked by mindshare |
 | `GET /v1/bankr` | $0.05 | Bankr agent universe attention dashboard |
 
 **Full sweep (all 7): $0.80**
@@ -488,9 +488,9 @@ Every token response (signal + token deep dive) includes a `signal_interpretatio
 
 `agent_action_hint` — `"high_conviction"` / `"flag"` / `"monitor"` / `"deprioritize"` / `"rotate_out"`
 
-## GET /v1/creators/{symbol} — $0.03
+## GET /v1/creators/{symbol} — $0.10
 
-Top 25 creators (authors) posting about a specific token. Shows who's driving narrative and their reach.
+Top 25 creators (authors) posting about a specific token, ranked by **mindshare** (% of conversation). Shows who's driving narrative with real engagement metrics (likes, replies, retweets).
 
 ```json
 {
@@ -536,17 +536,28 @@ Top 25 creators (authors) posting about a specific token. Shows who's driving na
 }
 ```
 
+**Key features:**
+- **Ranked by mindshare_pct**: creator's % share of total conversation (not just engagement)
+- **Hybrid data source**: DB-cached posts (fast) + Twitter API fallback (fresh) if sparse
+- **Protocol bots filtered**: excludes @bankrbot, @clawnbot, etc — only human creators
+- **Real engagement**: likes + replies + retweets tracked
+- **Time windows**: 24h, 72h, 168h (or all-time with hours=0)
+
 **Query params:**
 ```
 GET /v1/creators/BNKR?limit=25&min_followers=0&tier_filter=all
 GET /v1/creators/BNKR?tier_filter=macro&limit=10        # macro voices only
-GET /v1/creators/VVV?min_followers=10000                # 10k+ followers
+GET /v1/creators/BNKR?hours=24&limit=10                 # last 24h
+GET /v1/creators/BNKR?hours=72&tier_filter=micro        # 3-day micro voices
+GET /v1/creators/VVV?hours=168&limit=5                  # 7-day top 5
 ```
 
 **Use cases:**
-- Identify top amplifiers for a token (who has biggest reach + engagement)
-- Filter by tier: `?tier_filter=macro` for opinion leaders
-- Spot multi-token narratives: see `recent_coins` to identify cross-token patterns
+- Identify narrative drivers: who's actually moving conversation (mindshare %)
+- Distinguish whale moments from sustained movements (single viral post vs multiple posts)
+- Find emerging voices: nano/micro creators driving growth before macro joins
+- Ecosystem patterns: track who's posting across multiple BANKR tokens
+- Real-time monitoring: 24h window shows current active creators
 - Track account engagement: `avg_likes` + `post_count` = narrative strength proxy
 
 ---
