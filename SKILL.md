@@ -23,15 +23,13 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 
 | Endpoint | Price | What it returns |
 |---|---|---|
-| `GET /v1/leaderboard` | $0.02 | Top Base tokens ranked by attention share — macro orientation |
+| `GET /v1/leaderboard` | $0.05 | Top Base tokens by attention share — all 102 tracked tokens, flexible window (1-168h) |
 | `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities ranked by composite score, with timing. Use `?spiking_only=true` for spike-only mode (replaces `/v1/spikes`) |
-| `GET /v1/token/{symbol_or_ca}` | $0.45 | Full deep dive: attention, price, hawkes, timing, narrative, spike history. Accepts symbol (e.g. `BNKR`) or Base contract address |
+| `GET /v1/token/{symbol_or_ca}` | $0.75 | Full token profile: attention, price, hawkes, timing, narrative, spike history, top creators, project health score. Accepts symbol or Base contract address |
 | `GET /v1/rotation` | $0.10 | Where creators are moving — directed rotation graph with ATT growth confirmation |
-| `GET /v1/creators/{symbol}` | $0.10 | Top 25 creators for a token — ranked by mindshare (% of conversation), with engagement + follower tier |
-| `GET /v1/creators/bankr` | $0.10 | Top creators in BANKR ecosystem (BNKR, BANKR, CLAWBANK, GITBANK) — ranked by mindshare |
-| `GET /v1/bankr` | $0.05 | Bankr agent universe attention dashboard |
+| `GET /v1/creators/{symbol}` | $0.15 | Top creators for a token — ranked by mindshare, with engagement metrics and follower tier |
 
-**Full sweep (all 7): $0.80**
+**Full sweep (all 5): $1.20**
 
 `/v1/spikes` is deprecated — it 308-redirects to `/v1/signal?spiking_only=true` for backward compatibility.
 
@@ -169,10 +167,10 @@ async def main():
         # Spike-only mode — $0.15
         spikes = (await http.get("https://api.checkr.social/v1/signal?spiking_only=true")).json()
 
-        # Top tokens by attention — $0.02
+        # Top tokens by attention — $0.05
         leaderboard = (await http.get("https://api.checkr.social/v1/leaderboard")).json()
 
-        # Deep dive on a token — $0.45 (symbol or contract address)
+        # Deep dive on a token — $0.75 (symbol or contract address)
         token = (await http.get("https://api.checkr.social/v1/token/BNKR")).json()
         # or by CA:
         token = (await http.get("https://api.checkr.social/v1/token/0xa1f72459dfa10bad200ac160ecd78c6b77a747be")).json()
@@ -293,7 +291,7 @@ async with x402HttpxClient(client) as http:
     # 2. Filter to open windows only (timing is already in the response)
     open_signals = [s for s in signal["signals"] if s["timing"]["window_open"]]
 
-    # 3. Deep dive on the top opportunity ($0.45)
+    # 3. Deep dive on the top opportunity ($0.75)
     top = open_signals[0]["symbol"]
     detail = (await http.get(f"https://api.checkr.social/v1/token/{top}")).json()
     # → full attention, price, divergence, hawkes, timing, spike history, narrative
@@ -308,7 +306,7 @@ spikes = (await http.get("https://api.checkr.social/v1/signal?spiking_only=true"
 
 ## Example Responses (Live Data)
 
-### GET /v1/leaderboard — $0.02
+### GET /v1/leaderboard — $0.05
 
 ```json
 {
@@ -393,7 +391,7 @@ spikes = (await http.get("https://api.checkr.social/v1/signal?spiking_only=true"
 }
 ```
 
-### GET /v1/token/TIBBIR — $0.45
+### GET /v1/token/TIBBIR — $0.75
 
 ```json
 {
@@ -562,68 +560,16 @@ GET /v1/creators/VVV?hours=168&limit=5                  # 7-day top 5
 
 ---
 
-## GET /v1/creators/bankr — $0.03
-
-Top 25 creators in BANKR ecosystem (BNKR, BANKR, CLAWBANK, GITBANK combined). Two modes: aggregate (default, shows ambassadors) or per-token.
-
-```json
-{
-  "ecosystem": "BANKR",
-  "tokens": ["BNKR", "BANKR", "CLAWBANK", "GITBANK"],
-  "mode": "aggregate",
-  "top_creators": [
-    {
-      "username": "@soot_baler",
-      "follower_count": 376,
-      "tier": "nano",
-      "post_count": 9,
-      "avg_likes": 5.2,
-      "coins": ["BNKR", "CLAWBANK", "GITBANK"],
-      "last_active": "2026-02-19T21:30:27Z"
-    },
-    {
-      "username": "@latenightonbase",
-      "follower_count": 14227,
-      "tier": "macro",
-      "post_count": 6,
-      "avg_likes": 12.7,
-      "coins": ["BNKR", "BV7X"],
-      "last_active": "2026-06-18T22:01:54Z"
-    }
-  ],
-  "meta": {
-    "total_creators_found": 25,
-    "ecosystem_coverage": "98%"
-  }
-}
-```
-
-**Query params:**
-```
-GET /v1/creators/bankr                                   # aggregate: top creators across all 4 tokens
-GET /v1/creators/bankr?per_token=true&limit=10          # per-token: top 10 creators per token (3 groups)
-```
-
-**Use cases:**
-- Find ecosystem ambassadors (appear in multiple tokens)
-- Detect cross-token narratives: if same creator posts about BNKR + CLAWBANK + GITBANK, they're an ecosystem signal
-- Identify when single voices are driving entire ecosystem vs distributed participation
-- Track ecosystem health: high `ecosystem_coverage` = distributed (healthy), low = concentrated (risk)
-
----
-
 ## Query Params
 
 ```
-GET /v1/leaderboard?limit=10&sort_by=ATT_pct&min_mentions=5
+GET /v1/leaderboard?limit=10&sort_by=ATT_pct
 GET /v1/leaderboard?sort_by=ATT_delta&hours=4
 GET /v1/signal?spiking_only=true
 GET /v1/rotation?window=4h&limit=10
 GET /v1/creators/BNKR?tier_filter=macro&limit=10
-GET /v1/creators/BNKR?hours=24&limit=10                 # last 24h creators
-GET /v1/creators/BNKR?hours=168&tier_filter=macro       # last 7d macro voices
-GET /v1/creators/bankr?per_token=true&hours=72          # 3d per-token ecosystem
-GET /v1/bankr?sort_by=ATT_delta&hours=4
+GET /v1/creators/BNKR?hours=24&limit=10
+GET /v1/creators/BNKR?hours=168&tier_filter=macro
 ```
 
 ## Requirements

@@ -50,7 +50,7 @@ async def main():
         # Best signals right now — $0.15
         signal = (await http.get("https://api.checkr.social/v1/signal")).json()
 
-        # Deep dive on a token — $0.45
+        # Deep dive on a token — $0.75
         token = (await http.get("https://api.checkr.social/v1/token/TIBBIR")).json()
 
 asyncio.run(main())
@@ -215,10 +215,11 @@ The x402 client handles payment automatically — it reads the `PAYMENT-REQUIRED
 
 | Endpoint | Price | Description |
 |---|---|---|
-| `GET /v1/leaderboard` | $0.02 | Top Base tokens by attention share or growth (`sort_by=ATT_delta`) |
-| `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities with timing. Use `?spiking_only=true` for spike-only mode, `?include_narrative=true` for lightweight narratives |
+| `GET /v1/leaderboard` | $0.05 | Top Base tokens by attention share — all 102 tracked tokens, flexible window (1-168h) |
+| `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities with timing. Use `?spiking_only=true` for spike-only mode |
 | `GET /v1/rotation` | $0.10 | Directed creator rotation graph with confirmed ATT growth — token inflow/outflow with named account attribution (1h\|4h) |
-| `GET /v1/token/{symbol_or_ca}` | $0.45 | Full attention snapshot for one token — accepts symbol or Base contract address. Use `?include_narrative=true` for a lightweight narrative |
+| `GET /v1/token/{symbol_or_ca}` | $0.75 | Full token profile: attention, price, hawkes, timing, narrative, spike history, top creators, project health score |
+| `GET /v1/creators/{symbol}` | $0.15 | Top creators for a token — ranked by mindshare, with engagement metrics and follower tier |
 
 `/v1/spikes` is deprecated — it 308-redirects to `/v1/signal?spiking_only=true`.
 

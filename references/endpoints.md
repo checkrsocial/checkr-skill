@@ -4,7 +4,7 @@ Full field definitions for all 5 endpoints. Live docs: [api.checkr.social/docs](
 
 ---
 
-## GET /v1/leaderboard — $0.02
+## GET /v1/leaderboard — $0.05
 
 Macro orientation — top tokens ranked by attention share.
 
@@ -176,7 +176,7 @@ history_bonus    = 1.0 + (hit_rate × 0.5) if ≥5 historical spikes else 1.0
 
 ---
 
-## GET /v1/token/{symbol} — $0.45
+## GET /v1/token/{symbol} — $0.75
 
 Full deep dive on one token. Everything in one call: attention, live price, hawkes, timing, narrative, spike history.
 
