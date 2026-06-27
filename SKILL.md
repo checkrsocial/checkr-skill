@@ -27,7 +27,7 @@ Real-time X/Twitter attention intelligence for Base chain tokens.
 | `GET /v1/signal` | $0.15 | Cross-universe radar — best opportunities ranked by composite score, with timing. Use `?spiking_only=true` for spike-only mode (replaces `/v1/spikes`) |
 | `GET /v1/token/{symbol_or_ca}` | $0.75 | Full token profile: attention, price, hawkes, timing, narrative, spike history, top creators, project health score. Accepts symbol or Base contract address |
 | `GET /v1/rotation` | $0.10 | Where creators are moving — directed rotation graph with ATT growth confirmation |
-| `GET /v1/creators/{symbol}` | $0.15 | Top creators for a token — ranked by mindshare, with engagement metrics and follower tier |
+| `GET /v1/creators/{symbol}` | $0.15 | Top creators for a token — ranked by signal_score (relevance-weighted engagement × reach × cascade) |
 
 **Full sweep (all 5): $1.20**
 
@@ -486,79 +486,60 @@ Every token response (signal + token deep dive) includes a `signal_interpretatio
 
 `agent_action_hint` — `"high_conviction"` / `"flag"` / `"monitor"` / `"deprioritize"` / `"rotate_out"`
 
-## GET /v1/creators/{symbol} — $0.10
+## GET /v1/creators/{symbol} — $0.15
 
-Top 25 creators (authors) posting about a specific token, ranked by **mindshare** (% of conversation). Shows who's driving narrative with real engagement metrics (likes, replies, retweets).
+Who actually moves the feed for a specific token — ranked by **signal_score**, not post count.
+
+**Ranking:** `signal_score = weighted_avg_likes × log10(followers) × quality_factor + cascade_bonus`
+
+Each post is weighted by type:
+- Dedicated post (token is the subject, 1-3 cashtags): **1.0×**
+- Reply with explicit token mention: **0.7×**
+- Roundup (4+ coins, token is one of many): **0.4×**
+- Secondary mention (original post, no cashtag, @handle match only): **0.25×**
+- Pure reply noise (reply, no token mention): **0.1×**
+
+`cascade` = intra-community replies received + quote_count on creator's posts. Capped at 50% of weighted_avg_likes.
 
 ```json
 {
-  "symbol": "BNKR",
+  "symbol": "GITLAWB",
   "in_bankr_ecosystem": true,
   "creators": [
     {
-      "username": "@Pogabyte",
-      "follower_count": 1051,
-      "tier": "micro",
-      "post_count": 28,
-      "avg_likes": 28.5,
-      "max_likes": 41,
-      "recent_coins": [
-        { "coin": "CLAWNCH", "timestamp": "2026-02-16T17:02:04Z" },
-        { "coin": "MOLTEN", "timestamp": "2026-02-16T18:13:26Z" },
-        { "coin": "BNKR", "timestamp": "2026-02-16T23:29:56Z" }
-      ],
-      "last_active": "2026-02-17T11:09:26Z"
-    },
-    {
-      "username": "@100xDarren",
-      "follower_count": 21528,
+      "username": "@singularityhack",
+      "follower_count": 15560,
       "tier": "macro",
-      "post_count": 13,
-      "avg_likes": 25.7,
-      "max_likes": 77,
-      "recent_coins": [
-        { "coin": "ANTIHUNTER", "timestamp": "2026-02-15T12:39:01Z" },
-        { "coin": "BNKR", "timestamp": "2026-02-14T10:59:12Z" }
-      ],
-      "last_active": "2026-02-15T21:31:49Z"
+      "is_verified": true,
+      "post_count": 3,
+      "avg_likes": 83.3,
+      "weighted_avg_likes": 83.3,
+      "cascade": 4,
+      "quality_ratio": 1.0,
+      "mindshare_pct": 1.08,
+      "signal_score": 349.19,
+      "max_likes": 112,
+      "total_engagement": 319
     }
   ],
   "meta": {
-    "total_creators_found": 25,
-    "limit": 25,
-    "filters": {
-      "min_followers": 0,
-      "tier": "all"
-    }
+    "ranking": "signal_score (weighted_avg_likes * log10(followers) * quality_factor + cascade)",
+    "time_window_hours": 24,
+    "total_creators_found": 15
   }
 }
 ```
 
-**Key features:**
-- **Ranked by mindshare_pct**: creator's % share of total conversation (not just engagement)
-- **Hybrid data source**: DB-cached posts (fast) + Twitter API fallback (fresh) if sparse
-- **Protocol bots filtered**: excludes @bankrbot, @clawnbot, etc — only human creators
-- **Real engagement**: likes + replies + retweets tracked
-- **Time windows**: 24h, 72h, 168h (or all-time with hours=0)
-
 **Query params:**
 ```
-GET /v1/creators/BNKR?limit=25&min_followers=0&tier_filter=all
-GET /v1/creators/BNKR?tier_filter=macro&limit=10        # macro voices only
-GET /v1/creators/BNKR?hours=24&limit=10                 # last 24h
-GET /v1/creators/BNKR?hours=72&tier_filter=micro        # 3-day micro voices
-GET /v1/creators/VVV?hours=168&limit=5                  # 7-day top 5
+GET /v1/creators/GITLAWB?hours=24&limit=25
+GET /v1/creators/GITLAWB?hours=72                       # 3-day window
+GET /v1/creators/GITLAWB?hours=168                      # 7-day window
+GET /v1/creators/GITLAWB?tier_filter=macro&limit=10
 ```
 
-**Use cases:**
-- Identify narrative drivers: who's actually moving conversation (mindshare %)
-- Distinguish whale moments from sustained movements (single viral post vs multiple posts)
-- Find emerging voices: nano/micro creators driving growth before macro joins
-- Ecosystem patterns: track who's posting across multiple BANKR tokens
-- Real-time monitoring: 24h window shows current active creators
-- Track account engagement: `avg_likes` + `post_count` = narrative strength proxy
-
 ---
+
 
 ## Query Params
 
